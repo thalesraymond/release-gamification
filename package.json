@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky"
