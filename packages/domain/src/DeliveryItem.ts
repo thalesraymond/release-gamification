@@ -7,6 +7,18 @@ export default class DeliveryItem {
     public readonly title: string,
     public readonly description: string,
     public readonly squad: Squad,
-    public readonly deliveryDetails: IDeliveryDetails[],
+    private readonly deliveryDetails: IDeliveryDetails[],
   ) {}
+
+  getDeliveryDetails(): IDeliveryDetails[] {
+    return [...this.deliveryDetails];
+  }
+
+  addDeliveryDetails(deliveryDetails: IDeliveryDetails): void {
+    this.deliveryDetails.push(deliveryDetails);
+  }
+
+  getDeliveryDetailsByType(type: string): IDeliveryDetails[] {
+    return this.deliveryDetails.filter((detail) => detail.getType() === type);
+  }
 }

@@ -1,1 +1,5 @@
-export default interface IDeliveryDetails {}
+export default interface IDeliveryDetails {
+  getTitle(): string;
+  getDescription(): string;
+  getType(): string;
+}

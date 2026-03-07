@@ -7,4 +7,16 @@ export default class DeliveryGithubIssueDetails implements IDeliveryDetails {
     public readonly title: string,
     public readonly body: string,
   ) {}
+
+  getTitle(): string {
+    return this.title;
+  }
+
+  getDescription(): string {
+    return this.body;
+  }
+
+  getType(): string {
+    return "github_issue";
+  }
 }
