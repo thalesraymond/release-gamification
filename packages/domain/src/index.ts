@@ -1,4 +1,4 @@
-export { Squad } from "./Squad.js";
+export { Group } from "./Group.js";
 export { default as DeliveryItem } from "./DeliveryItem.js";
 
 export const helloDomain = () => {
