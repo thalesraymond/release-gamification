@@ -1,4 +1,4 @@
-export class Group {
+export default class Group {
   constructor(
     public readonly id: string,
     public readonly name: string,

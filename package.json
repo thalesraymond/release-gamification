@@ -47,5 +47,8 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "@types/node": "^25.5.0"
   }
 }

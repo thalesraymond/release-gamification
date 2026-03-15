@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import MobileRelease from "../src/MobileRelease.js";
 import MobilePlatform from "../src/MobilePlatform.js";
 import DeliveryItem from "../src/DeliveryItem.js";
-import { Group } from "../src/Group.js";
+import Group from "../src/Group.js";
 
 describe("MobileRelease", () => {
   const squad = new Group("groupId", "Squad Name", null);

@@ -1,5 +1,5 @@
 import IDeliveryDetails from "./IDeliveryDetails.js";
-import { Group } from "./Group.js";
+import Group from "./Group.js";
 
 export default class DeliveryItem {
   constructor(

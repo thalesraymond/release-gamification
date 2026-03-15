@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import DeliveryItem from "../src/DeliveryItem.js";
-import { Group } from "../src/Group.js";
+import Group from "../src/Group.js";
 import IDeliveryDetails from "../src/IDeliveryDetails.js";
 
 class MockDeliveryDetails implements IDeliveryDetails {
