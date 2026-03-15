@@ -14,5 +14,10 @@ export abstract class BaseMongoRepository<T> implements IBaseRepository<T> {
   abstract findById(id: string): Promise<T | null>;
   abstract findAll(): Promise<T[]>;
 
+  async delete(id: string): Promise<void> {
+    const collection = await this.getCollection();
+    await collection.deleteOne({ id });
+  }
+
   protected abstract mapToEntity(doc: Document): T;
 }

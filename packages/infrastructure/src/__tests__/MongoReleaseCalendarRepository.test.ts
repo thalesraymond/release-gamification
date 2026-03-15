@@ -7,6 +7,7 @@ vi.mock("../database.js", () => {
   const mockCollection = {
     updateOne: vi.fn(),
     findOne: vi.fn(),
+    deleteOne: vi.fn(),
     find: vi.fn().mockReturnThis(),
     toArray: vi.fn(),
   };
@@ -109,5 +110,11 @@ describe("MongoReleaseCalendarRepository", () => {
     expect(result.length).toBe(2);
     expect(result[0].name).toBe("Calendar 1");
     expect(result[1].name).toBe("Calendar 2");
+  });
+
+  it("should delete a release calendar", async () => {
+    await repository.delete("1");
+
+    expect(mockCollection.deleteOne).toHaveBeenCalledWith({ id: "1" });
   });
 });

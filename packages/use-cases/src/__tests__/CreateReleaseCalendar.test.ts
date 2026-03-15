@@ -15,6 +15,7 @@ describe("CreateReleaseCalendar", () => {
       findById: vi.fn(),
       findAll: vi.fn(),
       findByName: vi.fn(),
+      delete: vi.fn(),
     };
     useCase = new CreateReleaseCalendar(repository);
   });
