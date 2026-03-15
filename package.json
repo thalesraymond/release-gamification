@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky",
-    "commit": "git add . && cz"
+    "commit": "git add . && cz",
+    "dev:api": "pnpm --filter @release-gamification/apis dev"
   },
   "keywords": [],
   "author": "Thales Raymond",

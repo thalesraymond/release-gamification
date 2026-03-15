@@ -5,7 +5,7 @@ export default [
   {
     // Note: there should be no other properties in this object
     ignores: [
-      "coverage",
+      "**/coverage",
       "**/public",
       "**/dist",
       "pnpm-lock.yaml",
