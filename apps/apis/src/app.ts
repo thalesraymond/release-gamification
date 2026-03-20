@@ -11,11 +11,18 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 
-import { IReleaseCalendarRepository } from "@release-gamification/domain/src/index.js";
+import {
+  IReleaseCalendarRepository,
+  IReleaseItemRepository,
+  IMobileReleaseRepository,
+} from "@release-gamification/domain/src/index.js";
 import { createReleaseCalendarRoutes } from "./routes/release-calendars.js";
+import { createGithubWebhookRoutes } from "./routes/github-webhooks.js";
 
 export interface AppConfig {
   releaseCalendarRepository: IReleaseCalendarRepository;
+  releaseItemRepository: IReleaseItemRepository;
+  mobileReleaseRepository: IMobileReleaseRepository;
 }
 
 export function createApp(config: AppConfig): FastifyInstance {
@@ -50,6 +57,12 @@ export function createApp(config: AppConfig): FastifyInstance {
 
   // Register Routes
   app.register(createReleaseCalendarRoutes(config.releaseCalendarRepository));
+  app.register(
+    createGithubWebhookRoutes(
+      config.releaseItemRepository,
+      config.mobileReleaseRepository,
+    ),
+  );
 
   // Default Error Handler
   app.setErrorHandler((error: FastifyError, request, reply) => {

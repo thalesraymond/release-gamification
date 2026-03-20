@@ -9,3 +9,8 @@ export * from "./IDeliveryDetails.js";
 export { default as DeliveryGithubIssueDetails } from "./DeliveryGithubIssueDetails.js";
 export { default as DeliveryGithubPullRequestDetails } from "./DeliveryGithubPullRequestDetails.js";
 export { default as DeliveryServiceNowChangeDetails } from "./DeliveryServiceNowChangeDetails.js";
+export { default as ReleaseItem } from "./ReleaseItem.js";
+export { default as ReleaseItemType } from "./ReleaseItemType.js";
+export { default as Milestone } from "./Milestone.js";
+export * from "./IReleaseItemRepository.js";
+export * from "./IMobileReleaseRepository.js";

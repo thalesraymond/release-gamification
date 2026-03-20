@@ -1,13 +1,19 @@
 import { createApp } from "./app.js";
 import { MongoReleaseCalendarRepository } from "@release-gamification/infrastructure/src/MongoReleaseCalendarRepository.js";
+import { MongoReleaseItemRepository } from "@release-gamification/infrastructure/src/MongoReleaseItemRepository.js";
+import { MongoMobileReleaseRepository } from "@release-gamification/infrastructure/src/MongoMobileReleaseRepository.js";
 import { DatabaseConnection } from "@release-gamification/infrastructure/src/database.js";
 
 const start = async () => {
   try {
-    const repository = new MongoReleaseCalendarRepository();
+    const releaseCalendarRepository = new MongoReleaseCalendarRepository();
+    const releaseItemRepository = new MongoReleaseItemRepository();
+    const mobileReleaseRepository = new MongoMobileReleaseRepository();
 
     const app = createApp({
-      releaseCalendarRepository: repository,
+      releaseCalendarRepository,
+      releaseItemRepository,
+      mobileReleaseRepository,
     });
 
     const port = Number(process.env.PORT) || 3000;

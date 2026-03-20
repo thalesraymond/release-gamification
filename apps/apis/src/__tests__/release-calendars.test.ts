@@ -6,6 +6,25 @@ import { ReleaseCalendar } from "@release-gamification/domain/src/index.js";
 describe("Release Calendars API", () => {
   let repository: IReleaseCalendarRepository;
 
+  const mockReleaseItemRepository = {
+    upsert: vi.fn(),
+    findByRepoAndNumber: vi.fn(),
+    findAll: vi.fn(),
+  };
+
+  const mockMobileReleaseRepository = {
+    save: vi.fn(),
+    findByVersionAndPlatform: vi.fn(),
+  };
+
+  function buildApp() {
+    return createApp({
+      releaseCalendarRepository: repository,
+      releaseItemRepository: mockReleaseItemRepository,
+      mobileReleaseRepository: mockMobileReleaseRepository,
+    });
+  }
+
   beforeEach(() => {
     repository = {
       save: vi.fn(),
@@ -17,7 +36,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should create a release calendar with 201 status", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     vi.mocked(repository.findByName).mockResolvedValue(null);
 
     const response = await app.inject({
@@ -36,7 +55,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should return 409 if name already exists", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     vi.mocked(repository.findByName).mockResolvedValue(
       new ReleaseCalendar("1", "Existing Calendar", []),
     );
@@ -55,7 +74,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should return 400 for invalid input", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
 
     const response = await app.inject({
       method: "POST",
@@ -71,7 +90,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should return 404 for unknown routes", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
 
     const response = await app.inject({
       method: "GET",
@@ -82,7 +101,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should return 500 for unhandled errors", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     vi.mocked(repository.findByName).mockRejectedValue(
       new Error("Database error"),
     );
@@ -101,7 +120,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should list all release calendars", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     const calendars = [
       new ReleaseCalendar(
         "550e8400-e29b-41d4-a716-446655440000",
@@ -129,7 +148,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should get a single release calendar", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     const calendar = new ReleaseCalendar(
       "550e8400-e29b-41d4-a716-446655440000",
       "Test Calendar",
@@ -149,7 +168,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should return 404 when getting a non-existent calendar", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     vi.mocked(repository.findById).mockResolvedValue(null);
 
     const response = await app.inject({
@@ -161,12 +180,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should update an existing release calendar", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
-    const calendar = new ReleaseCalendar(
-      "550e8400-e29b-41d4-a716-446655440000",
-      "Updated Name",
-      [],
-    );
+    const app = buildApp();
     vi.mocked(repository.findById).mockResolvedValue(
       new ReleaseCalendar(
         "550e8400-e29b-41d4-a716-446655440000",
@@ -175,7 +189,6 @@ describe("Release Calendars API", () => {
       ),
     );
     vi.mocked(repository.findByName).mockResolvedValue(null);
-    vi.mocked(repository.save).mockResolvedValue(calendar);
 
     const response = await app.inject({
       method: "PUT",
@@ -191,7 +204,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should delete a release calendar", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
     vi.mocked(repository.findById).mockResolvedValue(
       new ReleaseCalendar(
         "550e8400-e29b-41d4-a716-446655440000",
@@ -213,7 +226,7 @@ describe("Release Calendars API", () => {
   });
 
   it("should have swagger docs available", async () => {
-    const app = createApp({ releaseCalendarRepository: repository });
+    const app = buildApp();
 
     const response = await app.inject({
       method: "GET",
