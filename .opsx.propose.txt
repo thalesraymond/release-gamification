@@ -1,1 +1,7 @@
-/opsx.propose Title: Mobile Release API Motivation: Currently, the system tracks mobile releases internally via webhooks and stores them in the database, but there is no way for clients to view or retrieve these releases. Providing a read-only API is the natural next step to bridge the gap between backend data collection and frontend consumption. Specification: Add ListMobileReleases and GetMobileRelease use cases. Expose GET /mobile-releases and GET /mobile-releases/:id Fastify API endpoints. Enhance MongoMobileReleaseRepository with findAll and findById methods, using MongoDB projections (.project({ _id: 0 })) for optimal performance.
+/opsx.propose Title: Weekly Release Summary Report
+Motivation: The system currently tracks ReleaseItems (GitHub PRs/Issues) and awards DeveloperScores based on them. As noted in the Architect journal, the project release cadence is strictly weekly. However, there is no aggregated view of the week's gamification results or the overall release health. Providing a Weekly Release Summary Report builds upon the existing gamification trajectory (developer-leaderboard, automated-github-feedback) by providing a natural climax to the weekly event cycle without introducing real-time complexities.
+Specification:
+- Create a GenerateWeeklyReleaseSummaryUseCase that queries the IMobileReleaseRepository and IReleaseItemRepository for the past 7 days.
+- Compile a summary including total points awarded, top 3 developers (using IDeveloperScoreRepository), and the number of ReleaseItems per platform.
+- Expose a `GET /summary/weekly` endpoint in the Fastify API to retrieve this report.
+- Adhere to the existing Clean Architecture patterns and use MongoDB projections for optimal querying.
