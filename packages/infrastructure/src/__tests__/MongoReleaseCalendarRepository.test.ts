@@ -1,7 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MongoReleaseCalendarRepository } from "../MongoReleaseCalendarRepository.js";
 import { DatabaseConnection } from "../database.js";
-import { ReleaseCalendar } from "@release-gamification/domain/src/index.js";
+import {
+  ReleaseCalendar,
+  MobileRelease,
+  MobilePlatform,
+  DeliveryItem,
+  Group,
+  DeliveryGithubIssueDetails,
+  DeliveryGithubPullRequestDetails,
+  DeliveryServiceNowChangeDetails,
+} from "@release-gamification/domain/src/index.js";
 
 vi.mock("../database.js", () => {
   const mockCollection = {
@@ -47,6 +56,7 @@ describe("MongoReleaseCalendarRepository", () => {
         $set: {
           id: "1",
           name: "Test Calendar",
+          mobileReleases: [],
         },
       },
       { upsert: true },
@@ -116,5 +126,193 @@ describe("MongoReleaseCalendarRepository", () => {
     await repository.delete("1");
 
     expect(mockCollection.deleteOne).toHaveBeenCalledWith({ id: "1" });
+  });
+
+  it("should save and reconstruct a complex release calendar with mobile releases", async () => {
+    const parentGroup = new Group("pg1", "Parent Group", null);
+    const squad = new Group("s1", "Squad 1", parentGroup);
+    const githubIssue = new DeliveryGithubIssueDetails(
+      123,
+      "https://github.com/issue/123",
+      "Issue Title",
+      "Issue Body",
+    );
+    const githubPR = new DeliveryGithubPullRequestDetails(
+      456,
+      "https://github.com/pr/456",
+      "PR Title",
+      "PR Body",
+      10,
+    );
+    const snChange = new DeliveryServiceNowChangeDetails(
+      "CHG001",
+      "CHG0000001",
+      "SN Short Desc",
+      "SN Desc",
+    );
+
+    const deliveryItem = new DeliveryItem(
+      "di1",
+      "Delivery Item 1",
+      "Description 1",
+      squad,
+      [githubIssue, githubPR, snChange],
+    );
+
+    const mobileRelease = new MobileRelease(
+      "mr1",
+      "1.0.0",
+      new Date("2024-01-01T10:00:00Z"),
+      MobilePlatform.IOS,
+      [deliveryItem],
+    );
+
+    const calendar = new ReleaseCalendar("c1", "Complex Calendar", [
+      mobileRelease,
+    ]);
+
+    await repository.save(calendar);
+
+    expect(mockCollection.updateOne).toHaveBeenCalledWith(
+      { id: "c1" },
+      expect.objectContaining({
+        $set: expect.objectContaining({
+          id: "c1",
+          name: "Complex Calendar",
+          mobileReleases: [
+            expect.objectContaining({
+              id: "mr1",
+              version: "1.0.0",
+              releaseDate: "2024-01-01T10:00:00.000Z",
+              platform: "ios",
+              deliveryItems: [
+                expect.objectContaining({
+                  id: "di1",
+                  title: "Delivery Item 1",
+                  squad: expect.objectContaining({
+                    id: "s1",
+                    name: "Squad 1",
+                    parent: { id: "pg1", name: "Parent Group" },
+                  }),
+                  deliveryDetails: [
+                    {
+                      type: "github_issue",
+                      number: 123,
+                      url: "https://github.com/issue/123",
+                      title: "Issue Title",
+                      body: "Issue Body",
+                    },
+                    {
+                      type: "github_pull_request",
+                      number: 456,
+                      url: "https://github.com/pr/456",
+                      title: "PR Title",
+                      body: "PR Body",
+                      changesCount: 10,
+                    },
+                    {
+                      type: "servicenow_change",
+                      changeId: "CHG001",
+                      changeNumber: "CHG0000001",
+                      shortDescription: "SN Short Desc",
+                      description: "SN Desc",
+                    },
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      }),
+      { upsert: true },
+    );
+
+    // Test reconstruction
+    const doc = {
+      id: "c1",
+      name: "Complex Calendar",
+      mobileReleases: [
+        {
+          id: "mr1",
+          version: "1.0.0",
+          releaseDate: "2024-01-01T10:00:00.000Z",
+          platform: "ios",
+          deliveryItems: [
+            {
+              id: "di1",
+              title: "Delivery Item 1",
+              description: "Description 1",
+              squad: {
+                id: "s1",
+                name: "Squad 1",
+                parent: { id: "pg1", name: "Parent Group" },
+              },
+              deliveryDetails: [
+                {
+                  type: "github_issue",
+                  number: 123,
+                  url: "https://github.com/issue/123",
+                  title: "Issue Title",
+                  body: "Issue Body",
+                },
+                {
+                  type: "github_pull_request",
+                  number: 456,
+                  url: "https://github.com/pr/456",
+                  title: "PR Title",
+                  body: "PR Body",
+                  changesCount: 10,
+                },
+                {
+                  type: "servicenow_change",
+                  changeId: "CHG001",
+                  changeNumber: "CHG0000001",
+                  shortDescription: "SN Short Desc",
+                  description: "SN Desc",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    mockCollection.findOne.mockResolvedValue(doc);
+
+    const result = await repository.findById("c1");
+
+    expect(result).toBeInstanceOf(ReleaseCalendar);
+    expect(result?.mobileReleases.length).toBe(1);
+    const mr = result!.mobileReleases[0];
+    expect(mr).toBeInstanceOf(MobileRelease);
+    expect(mr.id).toBe("mr1");
+    expect(mr.version).toBe("1.0.0");
+    expect(mr.releaseDate.toISOString()).toBe("2024-01-01T10:00:00.000Z");
+    expect(mr.platform).toBe(MobilePlatform.IOS);
+
+    expect(mr.getDeliveryItems().length).toBe(1);
+    const di = mr.getDeliveryItems()[0];
+    expect(di).toBeInstanceOf(DeliveryItem);
+    expect(di.id).toBe("di1");
+    expect(di.title).toBe("Delivery Item 1");
+    expect(di.squad).toBeInstanceOf(Group);
+    expect(di.squad.id).toBe("s1");
+    expect(di.squad.parent?.id).toBe("pg1");
+
+    expect(di.getDeliveryDetails().length).toBe(3);
+    expect(di.getDeliveryDetails()[0]).toBeInstanceOf(DeliveryGithubIssueDetails);
+    expect(di.getDeliveryDetails()[1]).toBeInstanceOf(DeliveryGithubPullRequestDetails);
+    expect(di.getDeliveryDetails()[2]).toBeInstanceOf(DeliveryServiceNowChangeDetails);
+
+    const ghIssue = di.getDeliveryDetails()[0] as DeliveryGithubIssueDetails;
+    expect(ghIssue.number).toBe(123);
+    expect(ghIssue.getType()).toBe("github_issue");
+
+    const ghPR = di.getDeliveryDetails()[1] as DeliveryGithubPullRequestDetails;
+    expect(ghPR.changesCount).toBe(10);
+    expect(ghPR.getType()).toBe("github_pull_request");
+
+    const sn = di.getDeliveryDetails()[2] as DeliveryServiceNowChangeDetails;
+    expect(sn.changeId).toBe("CHG001");
+    expect(sn.getType()).toBe("servicenow_change");
   });
 });
