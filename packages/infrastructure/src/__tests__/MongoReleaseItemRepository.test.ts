@@ -13,6 +13,7 @@ vi.mock("../database.js", () => {
     findOne: vi.fn(),
     deleteOne: vi.fn(),
     find: vi.fn().mockReturnThis(),
+    project: vi.fn().mockReturnThis(),
     toArray: vi.fn(),
   };
 
