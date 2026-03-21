@@ -85,7 +85,7 @@ describe("BaseMongoRepository", () => {
 
       await repository.delete(idToDelete);
 
-      expect(mockCollection.deleteOne).toHaveBeenCalledWith({ _id: idToDelete });
+      expect(mockCollection.deleteOne).toHaveBeenCalledWith({ id: idToDelete });
     });
   });
 });
