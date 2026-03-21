@@ -22,4 +22,4 @@ The `release-gamification` project tracks mobile releases and associates them wi
 ## Risks / Trade-offs
 
 - **Risk**: A single PR could have multiple reviews from the same person.
-  - **Mitigation**: We must ensure the gamification logic handles duplicate review points appropriately, or we might need to deduplicate reviews per PR per user before upserting into the `ReleaseItem` repository. For now, tracking each review as a unique `ReleaseItem` is fine.
+  - **Mitigation**: We must ensure the gamification logic handles duplicate review points appropriately. We will update the unique identifier for `ReleaseItem`s of type `PULL_REQUEST_REVIEW` to include reviewer information, creating a composite key for reviews (e.g., `{ repo, number, reviewerId }`). This allows us to track each developer's review of a given PR as a unique `ReleaseItem` in the repository, preventing previous reviews for the same PR from being overwritten.
