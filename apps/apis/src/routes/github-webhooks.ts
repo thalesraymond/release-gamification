@@ -45,6 +45,7 @@ const GithubWebhookSchema = {
   response: {
     200: WebhookResponseSchema,
     400: ErrorSchema,
+    401: ErrorSchema,
   },
 };
 
