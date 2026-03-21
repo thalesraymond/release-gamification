@@ -1,5 +1,12 @@
 import MobilePlatform from "./MobilePlatform.js";
 
+const PLATFORM_KEYWORDS: Record<string, MobilePlatform> = {
+  ios: MobilePlatform.IOS,
+  iphone: MobilePlatform.IOS,
+  ipad: MobilePlatform.IOS,
+  android: MobilePlatform.ANDROID,
+};
+
 export default class Milestone {
   private constructor(
     public readonly title: string,
@@ -14,17 +21,11 @@ export default class Milestone {
     }
 
     const lowerTitle = title.toLowerCase();
-    let platform: MobilePlatform | null = null;
 
-    if (
-      lowerTitle.includes("ios") ||
-      lowerTitle.includes("iphone") ||
-      lowerTitle.includes("ipad")
-    ) {
-      platform = MobilePlatform.IOS;
-    } else if (lowerTitle.includes("android")) {
-      platform = MobilePlatform.ANDROID;
-    }
+    const platform =
+      Object.entries(PLATFORM_KEYWORDS).find(([keyword]) =>
+        lowerTitle.includes(keyword),
+      )?.[1] ?? null;
 
     if (!platform) {
       return null;
