@@ -6,13 +6,14 @@ import { DatabaseConnection } from "@release-gamification/infrastructure/src/dat
 import { CryptoIdGenerator } from "@release-gamification/infrastructure/src/CryptoIdGenerator.js";
 
 const start = async () => {
+  let app;
   try {
     const releaseCalendarRepository = new MongoReleaseCalendarRepository();
     const releaseItemRepository = new MongoReleaseItemRepository();
     const mobileReleaseRepository = new MongoMobileReleaseRepository();
     const idGenerator = new CryptoIdGenerator();
 
-    const app = createApp({
+    app = createApp({
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
@@ -24,10 +25,14 @@ const start = async () => {
 
     await app.listen({ port, host });
 
-    console.log(`Server listening at http://${host}:${port}`);
-    console.log(`Documentation available at http://${host}:${port}/docs`);
+    app.log.info(`Server listening at http://${host}:${port}`);
+    app.log.info(`Documentation available at http://${host}:${port}/docs`);
   } catch (err) {
-    console.error(err);
+    if (app) {
+      app.log.error(err);
+    } else {
+      console.error(err);
+    }
     process.exit(1);
   }
 };

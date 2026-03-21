@@ -6,17 +6,14 @@ import { GetReleaseCalendar } from "@release-gamification/use-cases/src/GetRelea
 import { ListReleaseCalendars } from "@release-gamification/use-cases/src/ListReleaseCalendars.js";
 import { UpdateReleaseCalendar } from "@release-gamification/use-cases/src/UpdateReleaseCalendar.js";
 import { DeleteReleaseCalendar } from "@release-gamification/use-cases/src/DeleteReleaseCalendar.js";
+
+import { ErrorSchema } from "../schemas/error.js";
 import { IReleaseCalendarRepository, IIdGenerator } from "@release-gamification/domain/src/index.js";
+
 
 const ReleaseCalendarResponseSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-});
-
-const ErrorSchema = z.object({
-  statusCode: z.number(),
-  error: z.string(),
-  message: z.string(),
 });
 
 const CreateReleaseCalendarSchema = {
