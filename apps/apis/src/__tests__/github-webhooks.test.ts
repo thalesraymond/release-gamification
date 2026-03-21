@@ -216,4 +216,111 @@ describe("GitHub Webhooks API", () => {
 
     expect(response.statusCode).toBe(400);
   });
+
+  it("should return 400 for invalid payload (missing action)", async () => {
+    const app = buildApp();
+    const payload = {
+      repository: {
+        full_name: "owner/repo",
+      },
+      pull_request: {
+        number: 42,
+        title: "Fix login bug",
+        state: "open",
+        html_url: "https://github.com/owner/repo/pull/42",
+      },
+    };
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload,
+    });
+
+    expect(response.statusCode).toBe(400);
+    const body = JSON.parse(response.body);
+    expect(body.message).toBe("Validation Error");
+  });
+
+  it("should return 400 for invalid payload (malformed repository)", async () => {
+    const app = buildApp();
+    const payload = {
+      action: "opened",
+      repository: {},
+      pull_request: {
+        number: 42,
+        title: "Fix login bug",
+        state: "open",
+        html_url: "https://github.com/owner/repo/pull/42",
+      },
+    };
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload,
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 400 for invalid payload (malformed pull_request - missing number)", async () => {
+    const app = buildApp();
+    const payload = {
+      action: "opened",
+      repository: {
+        full_name: "owner/repo",
+      },
+      pull_request: {
+        title: "Fix login bug",
+        state: "open",
+        html_url: "https://github.com/owner/repo/pull/42",
+      },
+    };
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload,
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 400 for invalid payload (malformed pull_request - invalid html_url)", async () => {
+    const app = buildApp();
+    const payload = {
+      action: "opened",
+      repository: {
+        full_name: "owner/repo",
+      },
+      pull_request: {
+        number: 42,
+        title: "Fix login bug",
+        state: "open",
+        html_url: "not-a-url",
+      },
+    };
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload,
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 400 for empty payload", async () => {
+    const app = buildApp();
+    const payload = {};
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload,
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
 });
