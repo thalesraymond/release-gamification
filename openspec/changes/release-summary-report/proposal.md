@@ -4,7 +4,7 @@ The system currently tracks `ReleaseItem`s (GitHub PRs/Issues) and awards `Devel
 
 ## What Changes
 
-- Create a `GenerateWeeklyReleaseSummary` use case that queries the `IMobileReleaseRepository` and `IDeveloperScoreRepository` for the past 7 days.
+- Create a `GenerateWeeklyReleaseSummary` use case that queries the `IMobileReleaseRepository`, `IReleaseItemRepository`, and `IDeveloperScoreRepository` for the past 7 days.
 - Compile a summary including total points awarded, top 3 developers, and the number of `ReleaseItem`s per platform.
 - Expose a `GET /summary/weekly` endpoint in the Fastify API to retrieve this report.
 - Adhere to the existing Clean Architecture patterns and use MongoDB projections for optimal querying.
