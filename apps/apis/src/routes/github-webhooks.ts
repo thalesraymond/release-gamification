@@ -105,21 +105,19 @@ export function createGithubWebhookRoutes(
           const hmac = crypto.createHmac("sha256", secret);
           const expectedSignature = `sha256=${hmac.update(rawBody).digest("hex")}`;
 
+          let isValid = false;
           try {
-            const isValid = crypto.timingSafeEqual(
+            isValid = crypto.timingSafeEqual(
               Buffer.from(signatureHeader),
               Buffer.from(expectedSignature),
             );
-
-            if (!isValid) {
-              return reply.status(401).send({
-                statusCode: 401,
-                error: "Unauthorized",
-                message: "Invalid signature",
-              });
-            }
           } catch (error) {
-            // timingSafeEqual throws if lengths mismatch
+            // timingSafeEqual throws if buffer lengths are not equal.
+            // In this case, `isValid` will remain `false`, and we'll correctly
+            // return an Unauthorized error below.
+          }
+
+          if (!isValid) {
             return reply.status(401).send({
               statusCode: 401,
               error: "Unauthorized",
