@@ -29,7 +29,7 @@ const start = async () => {
       app.log.error(err);
     } else {
       process.stderr.write(
-        (err instanceof Error ? err.stack || err.message : String(err)) + "\n",
+        (err instanceof Error ? err.stack || err.message : JSON.stringify(err)) + "\n",
       );
     }
     process.exit(1);
