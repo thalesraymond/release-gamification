@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const DEFAULT_DB_NAME = "release_gamification";
+
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
   private client: MongoClient | null = null;
@@ -25,7 +27,7 @@ export class DatabaseConnection {
     }
 
     let uri = process.env.MONGODB_URI;
-    const dbName = process.env.DB_NAME || "release_gamification";
+    const dbName = process.env.DB_NAME || DEFAULT_DB_NAME;
 
     if (!uri || process.env.NODE_ENV === "test") {
       this.memoryServer = await MongoMemoryServer.create();
