@@ -24,7 +24,7 @@
     "@release-gamification/infrastructure": "workspace:*",
     "@release-gamification/use-cases": "workspace:*",
     "fastify": "^5.2.0",
-    "fastify-type-provider-zod": "^4.0.2",
+    "fastify-type-provider-zod": "^6.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
