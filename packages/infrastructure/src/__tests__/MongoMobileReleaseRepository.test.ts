@@ -11,6 +11,7 @@ vi.mock("../database.js", () => {
     updateOne: vi.fn(),
     findOne: vi.fn(),
     find: vi.fn().mockReturnThis(),
+    project: vi.fn().mockReturnThis(),
     toArray: vi.fn(),
   };
 
