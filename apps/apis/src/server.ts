@@ -28,7 +28,9 @@ const start = async () => {
     if (app) {
       app.log.error(err);
     } else {
-      console.error(err);
+      process.stderr.write(
+        (err instanceof Error ? err.stack || err.message : String(err)) + "\n",
+      );
     }
     process.exit(1);
   }
