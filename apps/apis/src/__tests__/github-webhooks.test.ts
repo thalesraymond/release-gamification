@@ -272,7 +272,14 @@ describe("GitHub Webhooks API", () => {
 
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
+    expect(body.statusCode).toBe(400);
+    expect(body.error).toBe("Bad Request");
     expect(body.message).toBe("Validation Error");
+    expect(body.details).toBeDefined();
+    expect(Array.isArray(body.details)).toBe(true);
+    expect(body.details.length).toBeGreaterThan(0);
+    expect(body.details[0].instancePath).toBe("/action");
+    expect(body.details[0].message).toBe("Required");
   });
 
   it("should return 400 for invalid payload (malformed repository)", async () => {
