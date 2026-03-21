@@ -34,7 +34,7 @@ class TestMongoRepository extends BaseMongoRepository<DummyEntity> {
 
   protected mapToEntity(doc: Document): DummyEntity {
     return {
-      id: doc.id,
+      id: doc._id,
       name: doc.name,
     };
   }
@@ -85,7 +85,7 @@ describe("BaseMongoRepository", () => {
 
       await repository.delete(idToDelete);
 
-      expect(mockCollection.deleteOne).toHaveBeenCalledWith({ id: idToDelete });
+      expect(mockCollection.deleteOne).toHaveBeenCalledWith({ _id: idToDelete });
     });
   });
 });

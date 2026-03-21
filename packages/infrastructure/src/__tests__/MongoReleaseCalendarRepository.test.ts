@@ -131,7 +131,7 @@ describe("MongoReleaseCalendarRepository", () => {
   it("should delete a release calendar", async () => {
     await repository.delete("1");
 
-    expect(mockCollection.deleteOne).toHaveBeenCalledWith({ id: "1" });
+    expect(mockCollection.deleteOne).toHaveBeenCalledWith({ _id: "1" });
   });
 
   it("should save and reconstruct a complex release calendar with mobile releases", async () => {
