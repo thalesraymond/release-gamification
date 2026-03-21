@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createHmac } from "node:crypto";
 import { createApp } from "../app.js";
 import {
   IReleaseCalendarRepository,
@@ -12,13 +13,21 @@ describe("GitHub Webhooks API", () => {
   let releaseItemRepository: IReleaseItemRepository;
   let mobileReleaseRepository: IMobileReleaseRepository;
   let releaseCalendarRepository: IReleaseCalendarRepository;
+  const githubWebhookSecret = "test-secret";
 
   function buildApp() {
     return createApp({
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      githubWebhookSecret,
     });
+  }
+
+  function signPayload(payload: any, secret: string) {
+    const hmac = createHmac("sha256", secret);
+    const body = JSON.stringify(payload);
+    return `sha256=${hmac.update(body).digest("hex")}`;
   }
 
   beforeEach(() => {
@@ -76,10 +85,14 @@ describe("GitHub Webhooks API", () => {
 
   it("should process a valid PR and create a new MobileRelease when none exists", async () => {
     const app = buildApp();
+    const signature = signPayload(validPRPayload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload: validPRPayload,
     });
 
@@ -102,10 +115,14 @@ describe("GitHub Webhooks API", () => {
       mobileReleaseRepository.findByVersionAndPlatform,
     ).mockResolvedValue(existing);
     const app = buildApp();
+    const signature = signPayload(validPRPayload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload: validPRPayload,
     });
 
@@ -116,10 +133,14 @@ describe("GitHub Webhooks API", () => {
 
   it("should process a valid issue with a valid milestone", async () => {
     const app = buildApp();
+    const signature = signPayload(validIssuePayload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload: validIssuePayload,
     });
 
@@ -138,10 +159,14 @@ describe("GitHub Webhooks API", () => {
         milestone: null,
       },
     };
+    const signature = signPayload(payload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload,
     });
 
@@ -162,10 +187,14 @@ describe("GitHub Webhooks API", () => {
         milestone: { title: "v1.2.0", due_on: null },
       },
     };
+    const signature = signPayload(payload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload,
     });
 
@@ -182,10 +211,14 @@ describe("GitHub Webhooks API", () => {
       action: "created",
       repository: { full_name: "owner/repo" },
     };
+    const signature = signPayload(payload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload,
     });
 
@@ -207,13 +240,48 @@ describe("GitHub Webhooks API", () => {
         html_url: "https://github.com/owner/repo/pull/42",
       },
     };
+    const signature = signPayload(payload, githubWebhookSecret);
 
     const response = await app.inject({
       method: "POST",
       url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": signature,
+      },
       payload,
     });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 401 for missing signature", async () => {
+    const app = buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload: validPRPayload,
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body.message).toBe("Missing GitHub signature");
+  });
+
+  it("should return 401 for invalid signature", async () => {
+    const app = buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      headers: {
+        "x-hub-signature-256": "sha256=invalid",
+      },
+      payload: validPRPayload,
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body.message).toBe("Invalid GitHub signature");
   });
 });

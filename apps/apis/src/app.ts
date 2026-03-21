@@ -23,6 +23,7 @@ export interface AppConfig {
   releaseCalendarRepository: IReleaseCalendarRepository;
   releaseItemRepository: IReleaseItemRepository;
   mobileReleaseRepository: IMobileReleaseRepository;
+  githubWebhookSecret: string;
 }
 
 export function createApp(config: AppConfig): FastifyInstance {
@@ -61,6 +62,7 @@ export function createApp(config: AppConfig): FastifyInstance {
     createGithubWebhookRoutes(
       config.releaseItemRepository,
       config.mobileReleaseRepository,
+      config.githubWebhookSecret,
     ),
   );
 

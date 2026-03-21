@@ -14,6 +14,7 @@ const start = async () => {
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      githubWebhookSecret: process.env.GITHUB_WEBHOOK_SECRET || "development-secret",
     });
 
     const port = Number(process.env.PORT) || 3000;

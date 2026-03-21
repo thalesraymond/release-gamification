@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { ProcessGithubWebhookItemUseCase } from "@release-gamification/use-cases/src/ProcessGithubWebhookItem.js";
 import {
   IReleaseItemRepository,
@@ -55,14 +56,68 @@ const GithubWebhookSchema = {
 export function createGithubWebhookRoutes(
   releaseItemRepository: IReleaseItemRepository,
   mobileReleaseRepository: IMobileReleaseRepository,
+  githubWebhookSecret: string,
 ): FastifyPluginAsync {
   return async (fastify: FastifyInstance) => {
     const app = fastify.withTypeProvider<ZodTypeProvider>();
+
+    fastify.addContentTypeParser(
+      "application/json",
+      { parseAs: "buffer" },
+      (request, body, done) => {
+        try {
+          const rawBody = body as Buffer;
+          (request as any).rawBody = rawBody;
+          const json = JSON.parse(rawBody.toString("utf8"));
+          done(null, json);
+        } catch (err: any) {
+          err.statusCode = 400;
+          done(err, undefined);
+        }
+      },
+    );
 
     app.post(
       "/webhooks/github",
       {
         schema: GithubWebhookSchema,
+        preHandler: async (request, reply) => {
+          const signature = request.headers["x-hub-signature-256"];
+          if (!signature || typeof signature !== "string") {
+            return reply.status(401).send({
+              statusCode: 401,
+              error: "Unauthorized",
+              message: "Missing GitHub signature",
+            });
+          }
+
+          const rawBody = (request as any).rawBody;
+          if (!rawBody) {
+            return reply.status(401).send({
+              statusCode: 401,
+              error: "Unauthorized",
+              message: "Missing raw body",
+            });
+          }
+
+          const hmac = createHmac("sha256", githubWebhookSecret);
+          const digest = Buffer.from(
+            "sha256=" + hmac.update(rawBody).digest("hex"),
+            "utf8",
+          );
+          const checksum = Buffer.from(signature, "utf8");
+
+          if (
+            digest.length !== checksum.length ||
+            !timingSafeEqual(digest, checksum)
+          ) {
+            return reply.status(401).send({
+              statusCode: 401,
+              error: "Unauthorized",
+              message: "Invalid GitHub signature",
+            });
+          }
+        },
       },
       async (request, reply) => {
         const payload = request.body;
