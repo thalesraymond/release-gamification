@@ -9,6 +9,7 @@ vi.mock("../database.js", () => {
     findOne: vi.fn(),
     deleteOne: vi.fn(),
     find: vi.fn().mockReturnThis(),
+    project: vi.fn().mockReturnThis(),
     toArray: vi.fn(),
   };
 
@@ -97,7 +98,7 @@ describe("MongoReleaseCalendarRepository", () => {
     expect(result).toBeNull();
   });
 
-  it("should find all release calendars", async () => {
+  it("should find all release calendars with projection", async () => {
     const docs = [
       { id: "1", name: "Calendar 1" },
       { id: "2", name: "Calendar 2" },
@@ -107,6 +108,11 @@ describe("MongoReleaseCalendarRepository", () => {
     const result = await repository.findAll();
 
     expect(mockCollection.find).toHaveBeenCalled();
+    expect(mockCollection.project).toHaveBeenCalledWith({
+      id: 1,
+      name: 1,
+      _id: 0,
+    });
     expect(result.length).toBe(2);
     expect(result[0].name).toBe("Calendar 1");
     expect(result[1].name).toBe("Calendar 2");
