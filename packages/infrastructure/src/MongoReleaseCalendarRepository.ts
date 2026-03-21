@@ -142,7 +142,9 @@ export class MongoReleaseCalendarRepository
         const squad = new Group(
           di.squad.id,
           di.squad.name,
-          di.squad.parent ? new Group(di.squad.parent.id, di.squad.parent.name, null) : null,
+          di.squad.parent
+            ? new Group(di.squad.parent.id, di.squad.parent.name, null)
+            : null,
         );
         return new DeliveryItem(
           di.id,

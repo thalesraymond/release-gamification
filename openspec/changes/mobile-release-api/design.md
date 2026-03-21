@@ -5,11 +5,13 @@ The backend currently listens to GitHub webhooks, processes them via `ProcessGit
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement `ListMobileReleases` and `GetMobileRelease` use cases.
 - Create `/mobile-releases` and `/mobile-releases/:id` Fastify API endpoints.
 - Enhance the `MongoMobileReleaseRepository` with `findAll` and `findById` methods, adhering to the architectural rule to use MongoDB projections (e.g., `.project({ _id: 0 })`) for optimal performance and memory usage.
 
 **Non-Goals:**
+
 - Creating, updating, or deleting `MobileRelease` entities through these APIs (these operations are strictly managed by webhooks/automation currently).
 - Complex filtering or advanced search capabilities; simple listing (optionally with basic pagination) is sufficient.
 

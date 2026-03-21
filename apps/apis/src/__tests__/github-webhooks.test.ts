@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import crypto from "crypto";
 import { createApp } from "../app.js";
 import {
   IReleaseCalendarRepository,
@@ -12,8 +13,16 @@ describe("GitHub Webhooks API", () => {
   let releaseItemRepository: IReleaseItemRepository;
   let mobileReleaseRepository: IMobileReleaseRepository;
   let releaseCalendarRepository: IReleaseCalendarRepository;
+  const mockSecret = "test-secret";
+
+  function generateSignature(payload: any) {
+    const hmac = crypto.createHmac("sha256", mockSecret);
+    const rawBody = Buffer.from(JSON.stringify(payload));
+    return `sha256=${hmac.update(rawBody).digest("hex")}`;
+  }
 
   function buildApp() {
+    process.env.GITHUB_WEBHOOK_SECRET = mockSecret;
     return createApp({
       releaseCalendarRepository,
       releaseItemRepository,
@@ -81,6 +90,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload: validPRPayload,
+      headers: {
+        "x-hub-signature-256": generateSignature(validPRPayload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -107,6 +119,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload: validPRPayload,
+      headers: {
+        "x-hub-signature-256": generateSignature(validPRPayload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -121,6 +136,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload: validIssuePayload,
+      headers: {
+        "x-hub-signature-256": generateSignature(validIssuePayload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -143,6 +161,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -167,6 +188,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -187,6 +211,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -212,6 +239,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -235,6 +265,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -259,6 +292,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -282,6 +318,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -306,6 +345,9 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -319,8 +361,62 @@ describe("GitHub Webhooks API", () => {
       method: "POST",
       url: "/webhooks/github",
       payload,
+      headers: {
+        "x-hub-signature-256": generateSignature(payload),
+      },
     });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 401 if signature is missing when secret is configured", async () => {
+    const app = buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload: validPRPayload,
+      // intentionally omit headers
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body.message).toBe("Missing signature");
+  });
+
+  it("should return 401 if signature is invalid", async () => {
+    const app = buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload: validPRPayload,
+      headers: {
+        "x-hub-signature-256": "sha256=invalid-signature",
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body.message).toBe("Invalid signature");
+  });
+
+  it("should pass through if no secret is configured", async () => {
+    process.env.GITHUB_WEBHOOK_SECRET = "";
+    // recreate app without secret
+    const app = createApp({
+      releaseCalendarRepository,
+      releaseItemRepository,
+      mobileReleaseRepository,
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/github",
+      payload: validPRPayload,
+      // no signature header needed
+    });
+
+    expect(response.statusCode).toBe(200);
   });
 });

@@ -305,9 +305,15 @@ describe("MongoReleaseCalendarRepository", () => {
     expect(di.squad.parent?.id).toBe("pg1");
 
     expect(di.getDeliveryDetails().length).toBe(3);
-    expect(di.getDeliveryDetails()[0]).toBeInstanceOf(DeliveryGithubIssueDetails);
-    expect(di.getDeliveryDetails()[1]).toBeInstanceOf(DeliveryGithubPullRequestDetails);
-    expect(di.getDeliveryDetails()[2]).toBeInstanceOf(DeliveryServiceNowChangeDetails);
+    expect(di.getDeliveryDetails()[0]).toBeInstanceOf(
+      DeliveryGithubIssueDetails,
+    );
+    expect(di.getDeliveryDetails()[1]).toBeInstanceOf(
+      DeliveryGithubPullRequestDetails,
+    );
+    expect(di.getDeliveryDetails()[2]).toBeInstanceOf(
+      DeliveryServiceNowChangeDetails,
+    );
 
     const ghIssue = di.getDeliveryDetails()[0] as DeliveryGithubIssueDetails;
     expect(ghIssue.number).toBe(123);
