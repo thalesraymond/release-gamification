@@ -15,7 +15,7 @@ The system tracks GitHub Issues and PRs via webhooks and stores them as `Release
 
 ## Decisions
 
-1. **Aggregation Logic**: The `GenerateWeeklyReleaseSummaryUseCase` will query `IMobileReleaseRepository` and `IDeveloperScoreRepository` to aggregate data for the past 7 days.
+1. **Aggregation Logic**: The `GenerateWeeklyReleaseSummaryUseCase` will query `IMobileReleaseRepository`, `IReleaseItemRepository`, and `IDeveloperScoreRepository` to aggregate data for the past 7 days.
 2. **Performance**: We will use MongoDB projections in repository retrieval methods to minimize data transfer, as noted in the Architect journal.
 
 ## Risks / Trade-offs
