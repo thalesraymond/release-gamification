@@ -21,14 +21,11 @@ export default class Milestone {
     }
 
     const lowerTitle = title.toLowerCase();
-    let platform: MobilePlatform | null = null;
 
-    for (const [keyword, mappedPlatform] of Object.entries(PLATFORM_KEYWORDS)) {
-      if (lowerTitle.includes(keyword)) {
-        platform = mappedPlatform;
-        break;
-      }
-    }
+    const platform =
+      Object.entries(PLATFORM_KEYWORDS).find(([keyword]) =>
+        lowerTitle.includes(keyword),
+      )?.[1] ?? null;
 
     if (!platform) {
       return null;
