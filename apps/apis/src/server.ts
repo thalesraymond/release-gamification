@@ -3,17 +3,20 @@ import { MongoReleaseCalendarRepository } from "@release-gamification/infrastruc
 import { MongoReleaseItemRepository } from "@release-gamification/infrastructure/src/MongoReleaseItemRepository.js";
 import { MongoMobileReleaseRepository } from "@release-gamification/infrastructure/src/MongoMobileReleaseRepository.js";
 import { DatabaseConnection } from "@release-gamification/infrastructure/src/database.js";
+import { CryptoIdGenerator } from "@release-gamification/infrastructure/src/CryptoIdGenerator.js";
 
 const start = async () => {
   try {
     const releaseCalendarRepository = new MongoReleaseCalendarRepository();
     const releaseItemRepository = new MongoReleaseItemRepository();
     const mobileReleaseRepository = new MongoMobileReleaseRepository();
+    const idGenerator = new CryptoIdGenerator();
 
     const app = createApp({
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator,
     });
 
     const port = Number(process.env.PORT) || 3000;

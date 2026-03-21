@@ -1,6 +1,7 @@
 import {
   ReleaseCalendar,
   IReleaseCalendarRepository,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 import { BaseUseCase } from "./BaseUseCase.js";
 
@@ -12,7 +13,10 @@ export class CreateReleaseCalendar extends BaseUseCase<
   CreateReleaseCalendarInput,
   ReleaseCalendar
 > {
-  constructor(private readonly repository: IReleaseCalendarRepository) {
+  constructor(
+    private readonly repository: IReleaseCalendarRepository,
+    private readonly idGenerator: IIdGenerator,
+  ) {
     super();
   }
 
@@ -24,7 +28,7 @@ export class CreateReleaseCalendar extends BaseUseCase<
       );
     }
 
-    const calendar = new ReleaseCalendar(crypto.randomUUID(), input.name, []);
+    const calendar = new ReleaseCalendar(this.idGenerator.generate(), input.name, []);
 
     await this.repository.save(calendar);
 

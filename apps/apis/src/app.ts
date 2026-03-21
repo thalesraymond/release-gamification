@@ -15,6 +15,7 @@ import {
   IReleaseCalendarRepository,
   IReleaseItemRepository,
   IMobileReleaseRepository,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 import { createReleaseCalendarRoutes } from "./routes/release-calendars.js";
 import { createGithubWebhookRoutes } from "./routes/github-webhooks.js";
@@ -23,6 +24,7 @@ export interface AppConfig {
   releaseCalendarRepository: IReleaseCalendarRepository;
   releaseItemRepository: IReleaseItemRepository;
   mobileReleaseRepository: IMobileReleaseRepository;
+  idGenerator: IIdGenerator;
 }
 
 export function createApp(config: AppConfig): FastifyInstance {
@@ -56,11 +58,12 @@ export function createApp(config: AppConfig): FastifyInstance {
   });
 
   // Register Routes
-  app.register(createReleaseCalendarRoutes(config.releaseCalendarRepository));
+  app.register(createReleaseCalendarRoutes(config.releaseCalendarRepository, config.idGenerator));
   app.register(
     createGithubWebhookRoutes(
       config.releaseItemRepository,
       config.mobileReleaseRepository,
+      config.idGenerator,
     ),
   );
 

@@ -10,11 +10,13 @@ import {
   MobileRelease,
   ReleaseItemType,
   MobilePlatform,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 
 describe("ProcessGithubWebhookItemUseCase", () => {
   let releaseItemRepository: IReleaseItemRepository;
   let mobileReleaseRepository: IMobileReleaseRepository;
+  let idGenerator: IIdGenerator;
   let useCase: ProcessGithubWebhookItemUseCase;
 
   beforeEach(() => {
@@ -27,9 +29,13 @@ describe("ProcessGithubWebhookItemUseCase", () => {
       save: vi.fn(),
       findByVersionAndPlatform: vi.fn().mockResolvedValue(null),
     };
+    idGenerator = {
+      generate: vi.fn().mockReturnValue("test-uuid"),
+    };
     useCase = new ProcessGithubWebhookItemUseCase(
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator,
     );
   });
 

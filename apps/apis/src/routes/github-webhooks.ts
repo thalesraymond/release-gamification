@@ -6,6 +6,7 @@ import {
   IReleaseItemRepository,
   IMobileReleaseRepository,
   ReleaseItemType,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 
 const MilestoneSchema = z
@@ -55,6 +56,7 @@ const GithubWebhookSchema = {
 export function createGithubWebhookRoutes(
   releaseItemRepository: IReleaseItemRepository,
   mobileReleaseRepository: IMobileReleaseRepository,
+  idGenerator: IIdGenerator,
 ): FastifyPluginAsync {
   return async (fastify: FastifyInstance) => {
     const app = fastify.withTypeProvider<ZodTypeProvider>();
@@ -86,6 +88,7 @@ export function createGithubWebhookRoutes(
         const useCase = new ProcessGithubWebhookItemUseCase(
           releaseItemRepository,
           mobileReleaseRepository,
+          idGenerator,
         );
         const result = await useCase.execute({
           action: payload.action,

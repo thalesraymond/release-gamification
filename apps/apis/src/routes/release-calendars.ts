@@ -6,7 +6,7 @@ import { GetReleaseCalendar } from "@release-gamification/use-cases/src/GetRelea
 import { ListReleaseCalendars } from "@release-gamification/use-cases/src/ListReleaseCalendars.js";
 import { UpdateReleaseCalendar } from "@release-gamification/use-cases/src/UpdateReleaseCalendar.js";
 import { DeleteReleaseCalendar } from "@release-gamification/use-cases/src/DeleteReleaseCalendar.js";
-import { IReleaseCalendarRepository } from "@release-gamification/domain/src/index.js";
+import { IReleaseCalendarRepository, IIdGenerator } from "@release-gamification/domain/src/index.js";
 
 const ReleaseCalendarResponseSchema = z.object({
   id: z.string().uuid(),
@@ -74,6 +74,7 @@ const DeleteReleaseCalendarSchema = {
 
 export function createReleaseCalendarRoutes(
   repository: IReleaseCalendarRepository,
+  idGenerator: IIdGenerator,
 ): FastifyPluginAsync {
   return async (fastify: FastifyInstance) => {
     const app = fastify.withTypeProvider<ZodTypeProvider>();
@@ -84,7 +85,7 @@ export function createReleaseCalendarRoutes(
         schema: CreateReleaseCalendarSchema,
       },
       async (request, reply) => {
-        const useCase = new CreateReleaseCalendar(repository);
+        const useCase = new CreateReleaseCalendar(repository, idGenerator);
         try {
           const calendar = await useCase.execute(request.body);
           return reply.status(201).send({

@@ -14,3 +14,4 @@ export { default as ReleaseItemType } from "./ReleaseItemType.js";
 export { default as Milestone } from "./Milestone.js";
 export * from "./IReleaseItemRepository.js";
 export * from "./IMobileReleaseRepository.js";
+export * from "./IIdGenerator.js";

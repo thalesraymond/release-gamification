@@ -6,18 +6,21 @@ import {
   IMobileReleaseRepository,
   MobileRelease,
   MobilePlatform,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 
 describe("GitHub Webhooks API", () => {
   let releaseItemRepository: IReleaseItemRepository;
   let mobileReleaseRepository: IMobileReleaseRepository;
   let releaseCalendarRepository: IReleaseCalendarRepository;
+  let idGenerator: IIdGenerator;
 
   function buildApp() {
     return createApp({
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator,
     });
   }
 
@@ -37,6 +40,9 @@ describe("GitHub Webhooks API", () => {
       findAll: vi.fn(),
       findByName: vi.fn(),
       delete: vi.fn(),
+    };
+    idGenerator = {
+      generate: vi.fn().mockReturnValue("test-uuid"),
     };
   });
 

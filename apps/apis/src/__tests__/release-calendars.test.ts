@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createApp } from "../app.js";
-import { IReleaseCalendarRepository } from "@release-gamification/domain/src/index.js";
+import { IReleaseCalendarRepository, IIdGenerator } from "@release-gamification/domain/src/index.js";
 import { ReleaseCalendar } from "@release-gamification/domain/src/index.js";
 
 describe("Release Calendars API", () => {
   let repository: IReleaseCalendarRepository;
+  let idGenerator: IIdGenerator;
 
   const mockReleaseItemRepository = {
     upsert: vi.fn(),
@@ -22,6 +23,7 @@ describe("Release Calendars API", () => {
       releaseCalendarRepository: repository,
       releaseItemRepository: mockReleaseItemRepository,
       mobileReleaseRepository: mockMobileReleaseRepository,
+      idGenerator,
     });
   }
 
@@ -32,6 +34,9 @@ describe("Release Calendars API", () => {
       findAll: vi.fn(),
       findByName: vi.fn(),
       delete: vi.fn(),
+    };
+    idGenerator = {
+      generate: vi.fn().mockReturnValue("00000000-0000-0000-0000-000000000000"),
     };
   });
 
