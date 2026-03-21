@@ -1,11 +1,11 @@
 import MobilePlatform from "./MobilePlatform.js";
 
-const PLATFORM_KEYWORDS: Record<string, MobilePlatform> = {
-  ios: MobilePlatform.IOS,
-  iphone: MobilePlatform.IOS,
-  ipad: MobilePlatform.IOS,
-  android: MobilePlatform.ANDROID,
-};
+const PLATFORM_MATCHERS = [
+  { keyword: "ios", platform: MobilePlatform.IOS },
+  { keyword: "iphone", platform: MobilePlatform.IOS },
+  { keyword: "ipad", platform: MobilePlatform.IOS },
+  { keyword: "android", platform: MobilePlatform.ANDROID },
+];
 
 export default class Milestone {
   private constructor(
@@ -23,9 +23,8 @@ export default class Milestone {
     const lowerTitle = title.toLowerCase();
 
     const platform =
-      Object.entries(PLATFORM_KEYWORDS).find(([keyword]) =>
-        lowerTitle.includes(keyword),
-      )?.[1] ?? null;
+      PLATFORM_MATCHERS.find(({ keyword }) => lowerTitle.includes(keyword))
+        ?.platform ?? null;
 
     if (!platform) {
       return null;
