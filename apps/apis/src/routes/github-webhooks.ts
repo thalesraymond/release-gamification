@@ -1,6 +1,12 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+
+declare module "fastify" {
+  interface FastifyRequest {
+    rawBody?: Buffer;
+  }
+}
 import crypto from "crypto";
 import { ProcessGithubWebhookItemUseCase } from "@release-gamification/use-cases/src/ProcessGithubWebhookItem.js";
 import {
@@ -63,8 +69,7 @@ export function createGithubWebhookRoutes(
       { parseAs: "buffer" },
       function (req, body, done) {
         try {
-          // @ts-ignore - fastify types don't expose rawBody easily without generic augmentation
-          req.rawBody = body;
+          req.rawBody = body as Buffer;
           const json = JSON.parse((body as Buffer).toString("utf8"));
           done(null, json);
         } catch (err) {
@@ -92,8 +97,7 @@ export function createGithubWebhookRoutes(
             });
           }
 
-          // @ts-ignore
-          const rawBody = request.rawBody as Buffer | undefined;
+          const rawBody = request.rawBody;
           if (!rawBody) {
             return reply.status(400).send({
               statusCode: 400,
