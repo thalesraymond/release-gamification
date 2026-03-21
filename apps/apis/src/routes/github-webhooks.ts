@@ -7,6 +7,7 @@ import {
   IMobileReleaseRepository,
   ReleaseItemType,
 } from "@release-gamification/domain/src/index.js";
+import { ErrorSchema } from "../schemas/error.js";
 
 const MilestoneSchema = z
   .object({
@@ -36,12 +37,6 @@ const GithubWebhookPayloadSchema = z.object({
 const WebhookResponseSchema = z.object({
   processed: z.boolean(),
   reason: z.string().optional(),
-});
-
-const ErrorSchema = z.object({
-  statusCode: z.number(),
-  error: z.string(),
-  message: z.string(),
 });
 
 const GithubWebhookSchema = {
