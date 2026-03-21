@@ -5,7 +5,7 @@ Currently, the system tracks mobile releases internally via webhooks and stores 
 ## What Changes
 
 - Add a `ListMobileReleases` use case to retrieve paginated or all mobile releases from the database.
-- Add a `GetMobileRelease` use case to fetch a specific mobile release by its ID or version/platform.
+- Add a `GetMobileRelease` use case to fetch a specific mobile release by its ID.
 - Expose a `GET /mobile-releases` Fastify API endpoint to list mobile releases.
 - Expose a `GET /mobile-releases/:id` Fastify API endpoint to get details of a single mobile release, including its `ReleaseItem`s.
 

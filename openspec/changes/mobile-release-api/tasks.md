@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Update `MongoMobileReleaseRepository.findAll` to accept pagination params and use `.project({ _id: 0, id: 1, version: 1, platform: 1, releaseDate: 1 })`.
 - [ ] 1.2 Update `MongoMobileReleaseRepository.findById` to use `.project({ _id: 0, id: 1, version: 1, platform: 1, releaseDate: 1 })`.
-- [ ] 1.3 Add `findByMilestone` method in `MongoReleaseItemRepository` with `.project(...)` to query `ReleaseItem`s for a specific release.
+- [ ] 1.3 Add `findByVersionAndPlatform` method in `MongoReleaseItemRepository` with `.project(...)` to query `ReleaseItem`s for a specific release.
 - [ ] 1.4 Export modified repository interfaces in `packages/domain/src/index.ts`.
 
 ## 2. Use Cases Implementation
