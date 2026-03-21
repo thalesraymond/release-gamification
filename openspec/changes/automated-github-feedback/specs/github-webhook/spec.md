@@ -2,7 +2,7 @@
 
 ### Requirement: Register Release Items Idempotently
 
-The system SHALL save valid GitHub Issues and PRs as `ReleaseItems` in the database, uniquely identified by the repository full name and the issue/PR number, using an upsert operation to prevent duplicates. Additionally, upon successful upsert, the system SHALL trigger the automated feedback comment mechanism.
+The system SHALL save valid GitHub Issues and PRs as ReleaseItems in the database, uniquely identified by the repository full name and the issue/PR number, using an upsert operation to prevent duplicates. Additionally, when an item is first tracked for a release, the system SHALL trigger the automated feedback comment mechanism.
 
 #### Scenario: New Item received
 
