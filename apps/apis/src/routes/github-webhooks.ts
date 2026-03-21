@@ -1,6 +1,13 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+
+declare module "fastify" {
+  interface FastifyRequest {
+    rawBody?: Buffer;
+  }
+}
+import crypto from "crypto";
 import { ProcessGithubWebhookItemUseCase } from "@release-gamification/use-cases/src/ProcessGithubWebhookItem.js";
 import {
   IReleaseItemRepository,
@@ -44,15 +51,32 @@ const GithubWebhookSchema = {
   response: {
     200: WebhookResponseSchema,
     400: ErrorSchema,
+    401: ErrorSchema,
   },
 };
 
 export function createGithubWebhookRoutes(
   releaseItemRepository: IReleaseItemRepository,
   mobileReleaseRepository: IMobileReleaseRepository,
+  githubWebhookSecret?: string,
 ): FastifyPluginAsync {
   return async (fastify: FastifyInstance) => {
     const app = fastify.withTypeProvider<ZodTypeProvider>();
+
+    // Override application/json parser to store raw buffer for HMAC verification
+    app.addContentTypeParser(
+      "application/json",
+      { parseAs: "buffer" },
+      function (req, body, done) {
+        try {
+          req.rawBody = body as Buffer;
+          const json = JSON.parse((body as Buffer).toString("utf8"));
+          done(null, json);
+        } catch (err) {
+          done(err as Error, undefined);
+        }
+      },
+    );
 
     app.post(
       "/webhooks/github",
@@ -60,6 +84,52 @@ export function createGithubWebhookRoutes(
         schema: GithubWebhookSchema,
       },
       async (request, reply) => {
+        const secret = githubWebhookSecret ?? process.env.GITHUB_WEBHOOK_SECRET;
+
+        // 🛡️ SECURITY: Verify GitHub webhook signature using HMAC SHA-256
+        if (secret) {
+          const signatureHeader = request.headers["x-hub-signature-256"];
+          if (!signatureHeader || typeof signatureHeader !== "string") {
+            return reply.status(401).send({
+              statusCode: 401,
+              error: "Unauthorized",
+              message: "Missing signature",
+            });
+          }
+
+          const rawBody = request.rawBody;
+          if (!rawBody) {
+            return reply.status(400).send({
+              statusCode: 400,
+              error: "Bad Request",
+              message: "Missing body",
+            });
+          }
+
+          const hmac = crypto.createHmac("sha256", secret);
+          const expectedSignature = `sha256=${hmac.update(rawBody).digest("hex")}`;
+
+          let isValid = false;
+          try {
+            isValid = crypto.timingSafeEqual(
+              Buffer.from(signatureHeader),
+              Buffer.from(expectedSignature),
+            );
+          } catch (error) {
+            // timingSafeEqual throws if buffer lengths are not equal.
+            // In this case, `isValid` will remain `false`, and we'll correctly
+            // return an Unauthorized error below.
+          }
+
+          if (!isValid) {
+            return reply.status(401).send({
+              statusCode: 401,
+              error: "Unauthorized",
+              message: "Invalid signature",
+            });
+          }
+        }
+
         const payload = request.body;
         const item = payload.pull_request ?? payload.issue;
 

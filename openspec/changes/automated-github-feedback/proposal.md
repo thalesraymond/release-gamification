@@ -11,9 +11,11 @@ With the upcoming `developer-leaderboard` feature, developers need visibility in
 ## Capabilities
 
 ### New Capabilities
+
 - `automated-github-feedback`: Adds the ability to post comments back to GitHub Issues and Pull Requests to notify authors that their item has been successfully tracked for a release.
 
 ### Modified Capabilities
+
 - `github-webhook`: The existing webhook processing logic will be modified to include a side-effect of posting a comment to GitHub upon successful tracking.
 
 ## Impact

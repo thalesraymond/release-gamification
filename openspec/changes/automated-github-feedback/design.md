@@ -5,11 +5,13 @@ The system tracks GitHub Issues and PRs via webhooks and stores them as `Release
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement an `IGithubCommentService` interface in the domain to abstract the external API call.
 - Implement `GithubCommentService` in the infrastructure layer using the `@octokit/rest` library to post comments to GitHub.
 - Modify the `ProcessGithubWebhookItemUseCase` to use the `IGithubCommentService` to post a congratulatory message on successful tracking of an item.
 
 **Non-Goals:**
+
 - Displaying the actual leaderboard score in the comment (we only want to notify them that the item is tracked).
 - Posting comments for items that are not successfully tracked (e.g. invalid milestones).
 - A two-way sync of comments.

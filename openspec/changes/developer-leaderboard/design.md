@@ -7,11 +7,13 @@ For this change, we will keep it simple and introduce a `DeveloperScore` entity.
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement a `DeveloperScore` domain entity and a MongoDB-backed repository to store scores.
 - Create a `CalculateDeveloperScores` use case to aggregate points.
 - Create a `GET /leaderboard` Fastify API endpoint.
 
 **Non-Goals:**
+
 - Real-time WebSocket updates for the leaderboard.
 - Complex scoring rules (e.g., different points for different PR sizes).
 - A frontend UI for the leaderboard (API only).

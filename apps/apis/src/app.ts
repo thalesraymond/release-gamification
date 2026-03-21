@@ -61,6 +61,7 @@ export function createApp(config: AppConfig): FastifyInstance {
     createGithubWebhookRoutes(
       config.releaseItemRepository,
       config.mobileReleaseRepository,
+      process.env.GITHUB_WEBHOOK_SECRET,
     ),
   );
 
