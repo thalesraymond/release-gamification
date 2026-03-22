@@ -18,4 +18,4 @@ The system already gamifies contributions by awarding points for GitHub PRs and 
 
 ## Risks / Trade-offs
 - **Risk:** High volume of events leading to redundant evaluations.
-  - **Mitigation:** Query `DeveloperAchievement` first. If a user already has a specific "one-time" badge, skip evaluation for that badge type.
+  - **Mitigation:** Use a composite unique key (e.g., `username_achievementId_tier` or similar) in the `DeveloperAchievement` collection. Query this index first. For repeatable or tiered achievements, ensure the tier or occurrence count is tracked to prevent redundant awards for the same threshold.

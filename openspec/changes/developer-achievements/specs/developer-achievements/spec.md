@@ -1,5 +1,12 @@
 ## ADDED Requirements
 
+### Requirement: Track Issue Labels
+The system MUST persist GitHub issue labels as part of the `ReleaseItem` data when processing webhook events to support label-based gamification logic.
+
+#### Scenario: Store Issue Labels
+- **WHEN** a GitHub Issue webhook is processed by the system.
+- **THEN** any associated labels MUST be extracted and stored within the resulting `ReleaseItem`'s delivery details.
+
 ### Requirement: Evaluate Developer Achievements
 The system MUST evaluate predefined achievement conditions whenever a developer is awarded a score for a ReleaseItem.
 
