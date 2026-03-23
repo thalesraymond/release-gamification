@@ -1,7 +1,7 @@
-/opsx.propose Title: Weekly Release Summary Report
-Motivation: The system currently tracks ReleaseItems (GitHub PRs/Issues) and awards DeveloperScores based on them. As noted in the Architect journal, the project release cadence is strictly weekly. However, there is no aggregated view of the week's gamification results or the overall release health. Providing a Weekly Release Summary Report builds upon the existing gamification trajectory (developer-leaderboard, automated-github-feedback) by providing a natural climax to the weekly event cycle without introducing real-time complexities.
+/opsx.propose Title: Slack Weekly Summary
+Motivation: The system currently generates a Weekly Release Summary Report via the API (`GET /summary/weekly`), but developers and stakeholders have to proactively pull this information. To truly close the feedback loop on our weekly gamification cycle and increase visibility, we need to push this summary to where the team already communicates. Integrating with Slack to automatically post the weekly summary is the logical next step to maximize the impact of the existing `weekly-release-summary` feature.
 Specification:
-- Create a GenerateWeeklyReleaseSummaryUseCase that queries the IMobileReleaseRepository and IReleaseItemRepository for the past 7 days.
-- Compile a summary including total points awarded, top 3 developers (using IDeveloperScoreRepository), and the number of ReleaseItems per platform.
-- Expose a `GET /summary/weekly` endpoint in the Fastify API to retrieve this report.
-- Adhere to the existing Clean Architecture patterns and use MongoDB projections for optimal querying.
+- Create an `ISlackNotificationService` interface in the domain layer.
+- Implement `SlackNotificationService` in the infrastructure layer to send messages via a Slack Webhook URL.
+- Create a `BroadcastWeeklySummaryUseCase` that orchestrates fetching the summary and sending it via the Slack service.
+- Setup a cron job within the Fastify app (e.g., using `node-cron`) to trigger the broadcast weekly.
