@@ -1,0 +1,24 @@
+## Why
+
+The system currently tracks `ReleaseItem`s (GitHub PRs/Issues) and awards `DeveloperScore`s based on them. As noted in the Architect journal, the project release cadence is strictly weekly. The project is actively shifting towards a gamification trajectory (`developer-leaderboard`, `automated-github-feedback`). Broadcasting the weekly developer leaderboard to a Slack channel is the logical next step to increase visibility of developers contributions, provide a natural climax to the weekly release cycle, and encourage team engagement without adding real-time complexities.
+
+## What Changes
+
+- Create an `ISlackNotificationService` interface in the domain layer.
+- Implement the service in the infrastructure layer using `@slack/web-api` or a simple webhook.
+- Create a `BroadcastWeeklyLeaderboard` use case that queries `GetLeaderboard` use case or repository for the top developers.
+- Schedule this broadcast to run weekly via a cron job (using a library like `node-cron` or within the Fastify instance) or expose a protected endpoint `POST /admin/broadcast-leaderboard` to trigger it manually/externally.
+
+## Capabilities
+
+### New Capabilities
+- `slack-leaderboard-broadcast`: Broadcasts the weekly developer leaderboard to a Slack channel to increase visibility of developers contributions and encourage team engagement.
+
+### Modified Capabilities
+
+## Impact
+
+- **Domain:** New `ISlackNotificationService` interface.
+- **Infrastructure:** New `SlackNotificationService` implementation.
+- **Use Cases:** New `BroadcastWeeklyLeaderboard` use case.
+- **API:** Potential new `POST /admin/broadcast-leaderboard` endpoint if triggered manually, or a cron job setup in the Fastify application.

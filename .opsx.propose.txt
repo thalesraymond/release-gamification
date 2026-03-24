@@ -1,7 +1,7 @@
-/opsx.propose Title: Weekly Release Summary Report
-Motivation: The system currently tracks ReleaseItems (GitHub PRs/Issues) and awards DeveloperScores based on them. As noted in the Architect journal, the project release cadence is strictly weekly. However, there is no aggregated view of the week's gamification results or the overall release health. Providing a Weekly Release Summary Report builds upon the existing gamification trajectory (developer-leaderboard, automated-github-feedback) by providing a natural climax to the weekly event cycle without introducing real-time complexities.
+/opsx.propose Title: Broadcast Weekly Leaderboard to Slack
+Motivation: The system currently tracks `ReleaseItem`s (GitHub PRs/Issues) and awards `DeveloperScore`s based on them. As noted in the Architect journal, the project release cadence is strictly weekly. The project is actively shifting towards a gamification trajectory (`developer-leaderboard`, `automated-github-feedback`). Broadcasting the weekly developer leaderboard to a Slack channel is the logical next step to increase visibility of developers contributions, provide a natural climax to the weekly release cycle, and encourage team engagement without adding real-time complexities.
 Specification:
-- Create a GenerateWeeklyReleaseSummaryUseCase that queries the IMobileReleaseRepository and IReleaseItemRepository for the past 7 days.
-- Compile a summary including total points awarded, top 3 developers (using IDeveloperScoreRepository), and the number of ReleaseItems per platform.
-- Expose a `GET /summary/weekly` endpoint in the Fastify API to retrieve this report.
-- Adhere to the existing Clean Architecture patterns and use MongoDB projections for optimal querying.
+- Create an `ISlackNotificationService` interface in the domain layer.
+- Implement the service in the infrastructure layer using `@slack/web-api` or a simple webhook.
+- Create a `BroadcastWeeklyLeaderboard` use case that queries `GetLeaderboard` use case or repository for the top developers.
+- Schedule this broadcast to run weekly via a cron job (using a library like `node-cron` or within the Fastify instance) or expose a protected endpoint `POST /admin/broadcast-leaderboard` to trigger it manually/externally.
