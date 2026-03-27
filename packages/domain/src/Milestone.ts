@@ -3,7 +3,7 @@ import MobilePlatform from "./MobilePlatform.js";
 // ⚡ Bolt Optimization:
 // Pre-compiled regular expressions prevent the regex engine from parsing
 // and recompiling the pattern on every webhook invocation.
-const VERSION_REGEX = /v?(\d+\.\d+(?:\.\d+)?)/i;
+const VERSION_REGEX = /v?(\d{1,10}\.\d{1,10}(?:\.\d{1,10})?)/i;
 const PLATFORM_REGEX = /(ios|iphone|ipad|android)/i;
 
 export default class Milestone {
