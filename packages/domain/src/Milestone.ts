@@ -1,11 +1,10 @@
 import MobilePlatform from "./MobilePlatform.js";
 
-const PLATFORM_MATCHERS = [
-  { keyword: "ios", platform: MobilePlatform.IOS },
-  { keyword: "iphone", platform: MobilePlatform.IOS },
-  { keyword: "ipad", platform: MobilePlatform.IOS },
-  { keyword: "android", platform: MobilePlatform.ANDROID },
-];
+// ⚡ Bolt Optimization:
+// Pre-compiled regular expressions prevent the regex engine from parsing
+// and recompiling the pattern on every webhook invocation.
+const VERSION_REGEX = /v?(\d+\.\d+(?:\.\d+)?)/i;
+const PLATFORM_REGEX = /(ios|iphone|ipad|android)/i;
 
 export default class Milestone {
   private constructor(
@@ -15,20 +14,24 @@ export default class Milestone {
   ) {}
 
   static parse(title: string): Milestone | null {
-    const versionMatch = title.match(/v?(\d+\.\d+(?:\.\d+)?)/i);
+    const versionMatch = title.match(VERSION_REGEX);
     if (!versionMatch) {
       return null;
     }
 
-    const lowerTitle = title.toLowerCase();
-
-    const platform =
-      PLATFORM_MATCHERS.find(({ keyword }) => lowerTitle.includes(keyword))
-        ?.platform ?? null;
-
-    if (!platform) {
+    // ⚡ Bolt Optimization:
+    // Replaced array iteration (`PLATFORM_MATCHERS.find`) and `title.toLowerCase()`
+    // with a single pre-compiled regular expression.
+    // Impact: Avoids allocating a new lowercased string of the full title
+    // and eliminates O(n) array iteration, reducing garbage collection
+    // pressure during high-volume webhook bursts.
+    const platformMatch = title.match(PLATFORM_REGEX);
+    if (!platformMatch) {
       return null;
     }
+
+    const matchedKeyword = platformMatch[1].toLowerCase();
+    const platform = matchedKeyword === "android" ? MobilePlatform.ANDROID : MobilePlatform.IOS;
 
     return new Milestone(title, versionMatch[1], platform);
   }
