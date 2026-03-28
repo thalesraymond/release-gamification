@@ -2,6 +2,7 @@ import fastify, { FastifyError, FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import sensible from "@fastify/sensible";
+import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import {
@@ -38,6 +39,12 @@ export function createApp(config: AppConfig): FastifyInstance {
   app.register(helmet);
   app.register(cors);
   app.register(sensible);
+
+  // 🛡️ SECURITY: Add global rate limiting to protect against DoS and brute-force attacks
+  app.register(rateLimit, {
+    max: 100,
+    timeWindow: "1 minute",
+  });
 
   // Register Swagger
   app.register(swagger, {
