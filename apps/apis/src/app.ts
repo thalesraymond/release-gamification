@@ -2,6 +2,7 @@ import fastify, { FastifyError, FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import sensible from "@fastify/sensible";
+import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import {
@@ -28,6 +29,7 @@ export interface AppConfig {
 export function createApp(config: AppConfig): FastifyInstance {
   const app = fastify({
     logger: true,
+    trustProxy: true,
   }).withTypeProvider<ZodTypeProvider>();
 
   // Register Zod compiler
@@ -38,6 +40,14 @@ export function createApp(config: AppConfig): FastifyInstance {
   app.register(helmet);
   app.register(cors);
   app.register(sensible);
+
+  // 🛡️ SECURITY: Add global rate limiting to protect against DoS and brute-force attacks
+  app.register(rateLimit, {
+    max: process.env.RATE_LIMIT_MAX
+      ? parseInt(process.env.RATE_LIMIT_MAX, 10)
+      : 100,
+    timeWindow: process.env.RATE_LIMIT_TIME_WINDOW || "1 minute",
+  });
 
   // Register Swagger
   app.register(swagger, {
