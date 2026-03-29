@@ -29,6 +29,7 @@ export interface AppConfig {
 export function createApp(config: AppConfig): FastifyInstance {
   const app = fastify({
     logger: true,
+    trustProxy: true,
   }).withTypeProvider<ZodTypeProvider>();
 
   // Register Zod compiler
@@ -42,8 +43,10 @@ export function createApp(config: AppConfig): FastifyInstance {
 
   // 🛡️ SECURITY: Add global rate limiting to protect against DoS and brute-force attacks
   app.register(rateLimit, {
-    max: 100,
-    timeWindow: "1 minute",
+    max: process.env.RATE_LIMIT_MAX
+      ? parseInt(process.env.RATE_LIMIT_MAX, 10)
+      : 100,
+    timeWindow: process.env.RATE_LIMIT_TIME_WINDOW || "1 minute",
   });
 
   // Register Swagger
