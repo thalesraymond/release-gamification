@@ -5,6 +5,7 @@ import {
   MobileRelease,
   IReleaseItemRepository,
   IMobileReleaseRepository,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 import { BaseUseCase } from "./BaseUseCase.js";
 
@@ -34,6 +35,7 @@ export class ProcessGithubWebhookItemUseCase extends BaseUseCase<
   constructor(
     private readonly releaseItemRepository: IReleaseItemRepository,
     private readonly mobileReleaseRepository: IMobileReleaseRepository,
+    private readonly idGenerator: IIdGenerator,
   ) {
     super();
   }
@@ -69,7 +71,7 @@ export class ProcessGithubWebhookItemUseCase extends BaseUseCase<
 
     if (!mobileRelease) {
       mobileRelease = new MobileRelease(
-        crypto.randomUUID(),
+        this.idGenerator.generate(),
         milestone.version,
         input.milestoneDueDate ?? new Date(),
         milestone.platform,
@@ -79,7 +81,7 @@ export class ProcessGithubWebhookItemUseCase extends BaseUseCase<
     }
 
     const releaseItem = new ReleaseItem(
-      crypto.randomUUID(),
+      this.idGenerator.generate(),
       input.repo,
       input.number,
       input.title,

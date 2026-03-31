@@ -148,9 +148,11 @@ export function createGithubWebhookRoutes(
           ? new Date(item.milestone.due_on)
           : null;
 
+        const idGenerator = { generate: () => crypto.randomUUID() };
         const useCase = new ProcessGithubWebhookItemUseCase(
           releaseItemRepository,
           mobileReleaseRepository,
+          idGenerator,
         );
         const result = await useCase.execute({
           action: payload.action,

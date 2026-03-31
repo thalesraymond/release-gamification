@@ -8,6 +8,7 @@ import { UpdateReleaseCalendar } from "@release-gamification/use-cases/src/Updat
 import { DeleteReleaseCalendar } from "@release-gamification/use-cases/src/DeleteReleaseCalendar.js";
 import { IReleaseCalendarRepository } from "@release-gamification/domain/src/index.js";
 import { ErrorSchema } from "../schemas/error.js";
+import crypto from "crypto";
 
 const ReleaseCalendarResponseSchema = z.object({
   id: z.string().uuid(),
@@ -79,7 +80,8 @@ export function createReleaseCalendarRoutes(
         schema: CreateReleaseCalendarSchema,
       },
       async (request, reply) => {
-        const useCase = new CreateReleaseCalendar(repository);
+        const idGenerator = { generate: () => crypto.randomUUID() };
+        const useCase = new CreateReleaseCalendar(repository, idGenerator);
         try {
           const calendar = await useCase.execute(request.body);
           return reply.status(201).send({

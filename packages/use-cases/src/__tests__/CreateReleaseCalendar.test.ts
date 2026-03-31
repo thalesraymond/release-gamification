@@ -3,10 +3,12 @@ import { CreateReleaseCalendar } from "../CreateReleaseCalendar.js";
 import {
   IReleaseCalendarRepository,
   ReleaseCalendar,
+  IIdGenerator,
 } from "@release-gamification/domain/src/index.js";
 
 describe("CreateReleaseCalendar", () => {
   let repository: IReleaseCalendarRepository;
+  let idGenerator: IIdGenerator;
   let useCase: CreateReleaseCalendar;
 
   beforeEach(() => {
@@ -17,7 +19,10 @@ describe("CreateReleaseCalendar", () => {
       findByName: vi.fn(),
       delete: vi.fn(),
     };
-    useCase = new CreateReleaseCalendar(repository);
+    idGenerator = {
+      generate: vi.fn().mockReturnValue("mocked-uuid"),
+    };
+    useCase = new CreateReleaseCalendar(repository, idGenerator);
   });
 
   it("should create a new release calendar when name is unique", async () => {
