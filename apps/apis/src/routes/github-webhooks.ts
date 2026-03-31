@@ -13,6 +13,8 @@ import {
   IReleaseItemRepository,
   IMobileReleaseRepository,
   ReleaseItemType,
+  IIdGenerator,
+  IDateProvider,
 } from "@release-gamification/domain/src/index.js";
 import { ErrorSchema } from "../schemas/error.js";
 
@@ -58,6 +60,8 @@ const GithubWebhookSchema = {
 export function createGithubWebhookRoutes(
   releaseItemRepository: IReleaseItemRepository,
   mobileReleaseRepository: IMobileReleaseRepository,
+  idGenerator: IIdGenerator,
+  dateProvider: IDateProvider,
   githubWebhookSecret?: string,
 ): FastifyPluginAsync {
   return async (fastify: FastifyInstance) => {
@@ -148,11 +152,11 @@ export function createGithubWebhookRoutes(
           ? new Date(item.milestone.due_on)
           : null;
 
-        const idGenerator = { generate: () => crypto.randomUUID() };
         const useCase = new ProcessGithubWebhookItemUseCase(
           releaseItemRepository,
           mobileReleaseRepository,
           idGenerator,
+          dateProvider,
         );
         const result = await useCase.execute({
           action: payload.action,

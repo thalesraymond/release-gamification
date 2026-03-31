@@ -31,6 +31,10 @@ describe("App", () => {
       releaseCalendarRepository: mockReleaseCalendarRepository,
       releaseItemRepository: mockReleaseItemRepository,
       mobileReleaseRepository: mockMobileReleaseRepository,
+      idGenerator: { generate: vi.fn().mockReturnValue("mocked-uuid") },
+      dateProvider: {
+        now: vi.fn().mockReturnValue(new Date("2024-01-01T12:00:00Z")),
+      },
     });
   }
 

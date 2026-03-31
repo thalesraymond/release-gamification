@@ -15,3 +15,4 @@ export { default as Milestone } from "./Milestone.js";
 export * from "./IReleaseItemRepository.js";
 export * from "./IMobileReleaseRepository.js";
 export * from "./IIdGenerator.js";
+export * from "./IDateProvider.js";

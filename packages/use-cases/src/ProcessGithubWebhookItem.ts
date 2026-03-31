@@ -6,6 +6,7 @@ import {
   IReleaseItemRepository,
   IMobileReleaseRepository,
   IIdGenerator,
+  IDateProvider,
 } from "@release-gamification/domain/src/index.js";
 import { BaseUseCase } from "./BaseUseCase.js";
 
@@ -36,6 +37,7 @@ export class ProcessGithubWebhookItemUseCase extends BaseUseCase<
     private readonly releaseItemRepository: IReleaseItemRepository,
     private readonly mobileReleaseRepository: IMobileReleaseRepository,
     private readonly idGenerator: IIdGenerator,
+    private readonly dateProvider: IDateProvider,
   ) {
     super();
   }
@@ -73,7 +75,7 @@ export class ProcessGithubWebhookItemUseCase extends BaseUseCase<
       mobileRelease = new MobileRelease(
         this.idGenerator.generate(),
         milestone.version,
-        input.milestoneDueDate ?? new Date(),
+        input.milestoneDueDate ?? this.dateProvider.now(),
         milestone.platform,
         [],
       );

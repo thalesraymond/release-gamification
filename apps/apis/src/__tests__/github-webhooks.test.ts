@@ -27,6 +27,10 @@ describe("GitHub Webhooks API", () => {
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator: { generate: vi.fn().mockReturnValue("mocked-uuid") },
+      dateProvider: {
+        now: vi.fn().mockReturnValue(new Date("2024-01-01T12:00:00Z")),
+      },
     });
   }
 
@@ -415,6 +419,10 @@ describe("GitHub Webhooks API", () => {
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator: { generate: vi.fn().mockReturnValue("mocked-uuid") },
+      dateProvider: {
+        now: vi.fn().mockReturnValue(new Date("2024-01-01T12:00:00Z")),
+      },
     });
 
     const response = await app.inject({

@@ -11,12 +11,14 @@ import {
   ReleaseItemType,
   MobilePlatform,
   IIdGenerator,
+  IDateProvider,
 } from "@release-gamification/domain/src/index.js";
 
 describe("ProcessGithubWebhookItemUseCase", () => {
   let releaseItemRepository: IReleaseItemRepository;
   let mobileReleaseRepository: IMobileReleaseRepository;
   let idGenerator: IIdGenerator;
+  let dateProvider: IDateProvider;
   let useCase: ProcessGithubWebhookItemUseCase;
 
   beforeEach(() => {
@@ -32,10 +34,14 @@ describe("ProcessGithubWebhookItemUseCase", () => {
     idGenerator = {
       generate: vi.fn().mockReturnValue("mocked-uuid"),
     };
+    dateProvider = {
+      now: vi.fn().mockReturnValue(new Date("2024-01-01T12:00:00Z")),
+    };
     useCase = new ProcessGithubWebhookItemUseCase(
       releaseItemRepository,
       mobileReleaseRepository,
       idGenerator,
+      dateProvider,
     );
   });
 
@@ -111,18 +117,11 @@ describe("ProcessGithubWebhookItemUseCase", () => {
   });
 
   it("should fall back to today when milestoneDueDate is null", async () => {
-    const before = new Date();
     await useCase.execute({ ...validInput, milestoneDueDate: null });
-    const after = new Date();
 
     const savedRelease = vi.mocked(mobileReleaseRepository.save).mock
       .calls[0][0];
-    expect(savedRelease.releaseDate.getTime()).toBeGreaterThanOrEqual(
-      before.getTime(),
-    );
-    expect(savedRelease.releaseDate.getTime()).toBeLessThanOrEqual(
-      after.getTime(),
-    );
+    expect(savedRelease.releaseDate).toEqual(new Date("2024-01-01T12:00:00Z"));
   });
 
   it("should process a valid Android issue", async () => {

@@ -3,6 +3,7 @@ import { MongoReleaseCalendarRepository } from "@release-gamification/infrastruc
 import { MongoReleaseItemRepository } from "@release-gamification/infrastructure/src/MongoReleaseItemRepository.js";
 import { MongoMobileReleaseRepository } from "@release-gamification/infrastructure/src/MongoMobileReleaseRepository.js";
 import { DatabaseConnection } from "@release-gamification/infrastructure/src/database.js";
+import crypto from "crypto";
 
 const start = async () => {
   let app;
@@ -11,10 +12,15 @@ const start = async () => {
     const releaseItemRepository = new MongoReleaseItemRepository();
     const mobileReleaseRepository = new MongoMobileReleaseRepository();
 
+    const idGenerator = { generate: () => crypto.randomUUID() };
+    const dateProvider = { now: () => new Date() };
+
     app = createApp({
       releaseCalendarRepository,
       releaseItemRepository,
       mobileReleaseRepository,
+      idGenerator,
+      dateProvider,
     });
 
     const port = Number(process.env.PORT) || 3000;
@@ -29,7 +35,9 @@ const start = async () => {
       app.log.error(err);
     } else {
       process.stderr.write(
-        (err instanceof Error ? err.stack || err.message : JSON.stringify(err)) + "\n",
+        (err instanceof Error
+          ? err.stack || err.message
+          : JSON.stringify(err)) + "\n",
       );
     }
     process.exit(1);
