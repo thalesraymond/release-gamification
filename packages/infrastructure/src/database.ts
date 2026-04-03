@@ -39,6 +39,31 @@ export class DatabaseConnection {
     await this.client.connect();
     this.db = this.client.db(dbName);
 
+    // ⚡ Bolt Optimization:
+    // Create necessary indexes for frequently queried fields to prevent full collection scans
+    // and optimize upsert/lookup operations.
+    // Impact: Turns O(N) collection scans into O(1) index lookups for critical webhook paths.
+    await Promise.all([
+      this.db
+        .collection("release_items")
+        .createIndex({ id: 1 }, { unique: true }),
+      this.db
+        .collection("release_items")
+        .createIndex({ repo: 1, number: 1 }, { unique: true }),
+      this.db
+        .collection("mobile_releases")
+        .createIndex({ id: 1 }, { unique: true }),
+      this.db
+        .collection("mobile_releases")
+        .createIndex({ version: 1, platform: 1 }, { unique: true }),
+      this.db
+        .collection("release_calendars")
+        .createIndex({ id: 1 }, { unique: true }),
+      this.db
+        .collection("release_calendars")
+        .createIndex({ name: 1 }, { unique: true }),
+    ]);
+
     return this.db;
   }
 
