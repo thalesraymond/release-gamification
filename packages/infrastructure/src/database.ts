@@ -32,7 +32,7 @@ export class DatabaseConnection {
     if (!uri || process.env.NODE_ENV === "test") {
       this.memoryServer = await MongoMemoryServer.create();
       uri = this.memoryServer.getUri();
-      console.log(`Using In-Memory MongoDB: ${uri}`);
+      console.log("Using In-Memory MongoDB");
     }
 
     this.client = new MongoClient(uri);

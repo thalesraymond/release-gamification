@@ -31,7 +31,10 @@ export default class Milestone {
     }
 
     const matchedKeyword = platformMatch[1].toLowerCase();
-    const platform = matchedKeyword === "android" ? MobilePlatform.ANDROID : MobilePlatform.IOS;
+    const platform =
+      matchedKeyword === "android"
+        ? MobilePlatform.ANDROID
+        : MobilePlatform.IOS;
 
     return new Milestone(title, versionMatch[1], platform);
   }

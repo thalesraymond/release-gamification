@@ -56,9 +56,22 @@ export class MongoReleaseItemRepository
 
   async findAll(): Promise<ReleaseItem[]> {
     const collection = await this.getCollection();
-    const docs = await collection.find().project({
-      id: 1, repo: 1, number: 1, title: 1, state: 1, type: 1, milestoneTitle: 1, version: 1, platform: 1, url: 1, _id: 0
-    }).toArray();
+    const docs = await collection
+      .find()
+      .project({
+        id: 1,
+        repo: 1,
+        number: 1,
+        title: 1,
+        state: 1,
+        type: 1,
+        milestoneTitle: 1,
+        version: 1,
+        platform: 1,
+        url: 1,
+        _id: 0,
+      })
+      .toArray();
     return docs.map((doc) => this.mapToEntity(doc));
   }
 
