@@ -9,3 +9,9 @@
 **Vulnerability:** The Fastify API application did not have a global rate limiter configured, making it susceptible to brute-force attacks on sensitive endpoints or denial-of-service (DoS) from high-volume traffic.
 **Learning:** Fastify applications should implement rate limiting early in the request lifecycle to protect all registered routes by default.
 **Prevention:** Always register `@fastify/rate-limit` as a standard security plugin alongside `helmet` and `cors` in `apps/apis/src/app.ts`.
+
+## 2026-04-04 - [Log Sanitization]
+
+**Vulnerability:** MongoDB connection string (URI) was being logged to the console during in-memory database initialization.
+**Learning:** In the infrastructure layer, connection strings and URIs must not be logged, even for test databases, to prevent accidental information exposure.
+**Prevention:** Sanitize logs by omitting sensitive connection details.

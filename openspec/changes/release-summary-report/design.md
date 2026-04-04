@@ -5,11 +5,13 @@ The system tracks GitHub Issues and PRs via webhooks and stores them as `Release
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement a `WeeklyReleaseSummary` domain entity to represent the aggregated report.
 - Create a `GenerateWeeklyReleaseSummaryUseCase` to aggregate data from the past 7 days.
 - Create a `GET /summary/weekly` Fastify API endpoint.
 
 **Non-Goals:**
+
 - Real-time updates for the summary.
 - A frontend UI for the summary (API only).
 

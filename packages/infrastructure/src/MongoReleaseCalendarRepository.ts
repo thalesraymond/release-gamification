@@ -95,7 +95,10 @@ export class MongoReleaseCalendarRepository
 
   async findAll(): Promise<ReleaseCalendar[]> {
     const collection = await this.getCollection();
-    const docs = await collection.find().project({ id: 1, name: 1, _id: 0 }).toArray();
+    const docs = await collection
+      .find()
+      .project({ id: 1, name: 1, _id: 0 })
+      .toArray();
     return docs.map((doc) => this.mapToEntity(doc));
   }
 

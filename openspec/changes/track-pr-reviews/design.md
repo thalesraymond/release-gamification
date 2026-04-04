@@ -5,11 +5,13 @@ The `release-gamification` project tracks mobile releases and associates them wi
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Successfully process `pull_request_review` webhooks from GitHub.
 - Store a `ReleaseItem` representing the review in the database.
 - Attribute points to the developer who performed the review.
 
 **Non-Goals:**
+
 - Implementing the point awarding logic in `developer-leaderboard` directly (this is handled in the existing leaderboard capability or next step, but tracking is the focus here).
 - Real-time updates to the UI (out of scope, sticking to Weekly or on-demand).
 

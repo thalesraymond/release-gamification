@@ -46,7 +46,10 @@ export class MongoMobileReleaseRepository
 
   async findAll(): Promise<MobileRelease[]> {
     const collection = await this.getCollection();
-    const docs = await collection.find().project({ id: 1, version: 1, releaseDate: 1, platform: 1, _id: 0 }).toArray();
+    const docs = await collection
+      .find()
+      .project({ id: 1, version: 1, releaseDate: 1, platform: 1, _id: 0 })
+      .toArray();
     return docs.map((doc) => this.mapToEntity(doc));
   }
 
