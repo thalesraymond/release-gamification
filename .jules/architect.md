@@ -15,3 +15,9 @@
 **Discovery:** Internal service decoupling must use Node's `EventEmitter` instead of an external message broker like Redis or RabbitMQ due to single-node local Docker development environment constraints.
 **Impact:** Future architectural proposals requiring async background processing or pub/sub mechanisms must strictly rely on in-process `EventEmitter` solutions to adhere to existing environmental constraints.
 **Source:** Memory, `.jules/architect.md` rules
+
+## 2024-05-17 - Team Hierarchy and Metrics
+
+**Discovery:** The domain layer already contains a `Group` entity, establishing team hierarchies. However, existing gamification metrics only target individuals.
+**Impact:** Future gamification proposals should consider team-level impacts to leverage this existing hierarchy without storing redundant state.
+**Source:** `packages/domain/src/Group.ts`, `openspec/changes/team-gamification-leaderboard/proposal.md`
