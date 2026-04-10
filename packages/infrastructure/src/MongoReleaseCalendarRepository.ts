@@ -47,38 +47,10 @@ export class MongoReleaseCalendarRepository
                     }
                   : null,
               },
-              deliveryDetails: di.getDeliveryDetails().map((dd) => {
-                const type = dd.getType();
-                if (dd instanceof DeliveryGithubIssueDetails) {
-                  return {
-                    type,
-                    number: dd.number,
-                    url: dd.url,
-                    title: dd.title,
-                    body: dd.body,
-                  };
-                }
-                if (dd instanceof DeliveryGithubPullRequestDetails) {
-                  return {
-                    type,
-                    number: dd.number,
-                    url: dd.url,
-                    title: dd.title,
-                    body: dd.body,
-                    changesCount: dd.changesCount,
-                  };
-                }
-                if (dd instanceof DeliveryServiceNowChangeDetails) {
-                  return {
-                    type,
-                    changeId: dd.changeId,
-                    changeNumber: dd.changeNumber,
-                    shortDescription: dd.shortDescription,
-                    description: dd.description,
-                  };
-                }
-                return { type };
-              }),
+              // ⚡ Bolt Optimization:
+              // Replaced linear instanceof type-checking chain with a polymorphic toJSON() method.
+              // This avoids expensive prototype chain lookups during array iteration.
+              deliveryDetails: di.getDeliveryDetails().map((dd) => dd.toJSON()),
             })),
           })),
         },
@@ -95,7 +67,10 @@ export class MongoReleaseCalendarRepository
 
   async findAll(): Promise<ReleaseCalendar[]> {
     const collection = await this.getCollection();
-    const docs = await collection.find().project({ id: 1, name: 1, _id: 0 }).toArray();
+    const docs = await collection
+      .find()
+      .project({ id: 1, name: 1, _id: 0 })
+      .toArray();
     return docs.map((doc) => this.mapToEntity(doc));
   }
 
