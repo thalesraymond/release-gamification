@@ -19,4 +19,14 @@ export default class DeliveryGithubIssueDetails implements IDeliveryDetails {
   getType(): string {
     return "github_issue";
   }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.getType(),
+      number: this.number,
+      url: this.url,
+      title: this.title,
+      body: this.body,
+    };
+  }
 }

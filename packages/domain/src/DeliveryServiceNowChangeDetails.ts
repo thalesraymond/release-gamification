@@ -17,4 +17,14 @@ export default class DeliveryServiceNowChangeDetails implements IDeliveryDetails
   getType(): string {
     return "servicenow_change";
   }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.getType(),
+      changeId: this.changeId,
+      changeNumber: this.changeNumber,
+      shortDescription: this.shortDescription,
+      description: this.description,
+    };
+  }
 }

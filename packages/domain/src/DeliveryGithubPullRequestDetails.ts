@@ -20,4 +20,15 @@ export default class DeliveryGithubPullRequestDetails implements IDeliveryDetail
   getType(): string {
     return "github_pull_request";
   }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.getType(),
+      number: this.number,
+      url: this.url,
+      title: this.title,
+      body: this.body,
+      changesCount: this.changesCount,
+    };
+  }
 }
