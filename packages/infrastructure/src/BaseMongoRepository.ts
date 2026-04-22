@@ -3,11 +3,17 @@ import { IBaseRepository } from "@release-gamification/domain/src/IBaseRepositor
 import { DatabaseConnection } from "./database.js";
 
 export abstract class BaseMongoRepository<T> implements IBaseRepository<T> {
+  private cachedCollection: Collection<Document> | null = null;
+
   constructor(protected readonly collectionName: string) {}
 
   protected async getCollection(): Promise<Collection<Document>> {
+    if (this.cachedCollection) {
+      return this.cachedCollection;
+    }
     const db = await DatabaseConnection.getInstance().getDb();
-    return db.collection(this.collectionName);
+    this.cachedCollection = db.collection(this.collectionName);
+    return this.cachedCollection;
   }
 
   abstract save(entity: T): Promise<void>;
